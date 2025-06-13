@@ -219,7 +219,9 @@ scene.add(asteroidParticleSystem);
 
 // 加载星空背景图
 const textureLoader = new THREE.TextureLoader();
-textureLoader.load('/stars.png', function(texture) {
+
+const starsTexturePath = new URL('./public/stars.png', import.meta.url).href;
+textureLoader.load(starsTexturePath, function(texture) {
   texture.minFilter = THREE.LinearFilter;
   scene.background = texture;
   animate();
@@ -248,7 +250,8 @@ let hasUserInteracted = false;
 function handleFirstInteraction() {
   if (!hasUserInteracted) {
     const audioLoader = new THREE.AudioLoader();
-    audioLoader.load('/stars.mp3', function(buffer) {
+    const starsAudioPath = new URL('./public/stars.mp3', import.meta.url).href;
+    audioLoader.load(starsAudioPath, function(buffer) {
       backgroundMusic.setBuffer(buffer);
       backgroundMusic.setLoop(true);
       backgroundMusic.setVolume(0.5); // 设置正常音量

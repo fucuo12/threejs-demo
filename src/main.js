@@ -47,9 +47,9 @@ scene.add(ambientLight);
 // 创建核心粒子系统
 createParticleSystem(scene);
 
-// 加载星空背景图
+// 加载星空背景图（✅ 已修改为相对路径）
 const textureLoader = new THREE.TextureLoader();
-const starsTexturePath = new URL('/stars.png', import.meta.url).href;
+const starsTexturePath = new URL('./stars.png', import.meta.url).href;
 textureLoader.load(starsTexturePath, function(texture) {
   texture.minFilter = THREE.LinearFilter;
   scene.background = texture;
@@ -71,7 +71,7 @@ function animate() {
   composer.render(); // 使用后处理渲染
 }
 
-// 音频部分
+// 音频部分（✅ 已修改为相对路径）
 function handleFirstInteraction(event) {
   if (hasUserInteracted) return;
 
@@ -80,13 +80,13 @@ function handleFirstInteraction(event) {
   camera.add(listener);
 
   const context = listener.context;
-  
+
   // 在用户交互内创建和恢复 AudioContext
   context.resume().then(() => {
     console.log('🎵 [Mobile] AudioContext 已恢复');
 
     const audioLoader = new THREE.AudioLoader();
-    const starsAudioPath = new URL('/stars.mp3', import.meta.url).href;
+    const starsAudioPath = new URL('./stars.mp3', import.meta.url).href;
 
     backgroundMusic = new THREE.Audio(listener);
     audioLoader.load(
@@ -205,7 +205,15 @@ function createParticleSystem(scene) {
   scene.add(particleSystem);
 }
 
+/**
+ * ✅ 可选：添加粒子动画效果
+ */
 function updateParticles(time) {
-  // 这里可以添加更新粒子位置或属性的逻辑
-  // 示例中仅作为占位符
+  const positions = this.scene.children[1]?.geometry.attributes.position.array;
+  if (!positions) return;
+
+  for (let i = 0; i < positions.length; i += 3) {
+    positions[i + 2] += Math.sin(time + i) * 0.001; // Z轴轻微波动
+  }
+  this.scene.children[1].geometry.attributes.position.needsUpdate = true;
 }

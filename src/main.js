@@ -220,11 +220,13 @@ scene.add(asteroidParticleSystem);
 // 加载星空背景图
 const textureLoader = new THREE.TextureLoader();
 
-const starsTexturePath = new URL('./public/stars.png', import.meta.url).href;
+const starsTexturePath = new URL('/stars.png', import.meta.url).href;
 textureLoader.load(starsTexturePath, function(texture) {
   texture.minFilter = THREE.LinearFilter;
   scene.background = texture;
   animate();
+}, undefined, function(err) {
+  console.error('❌ 纹理加载失败:', err);
 });
 
 // 动画循环
@@ -249,20 +251,30 @@ let hasUserInteracted = false;
 
 function handleFirstInteraction() {
   if (!hasUserInteracted) {
-    const audioLoader = new THREE.AudioLoader();
-    const starsAudioPath = new URL('./public/stars.mp3', import.meta.url).href;
-    audioLoader.load(starsAudioPath, function(buffer) {
-      backgroundMusic.setBuffer(buffer);
-      backgroundMusic.setLoop(true);
-      backgroundMusic.setVolume(0.5); // 设置正常音量
-      backgroundMusic.play();         // 开始播放
-      hasUserInteracted = true;
-      console.log('🎵 背景音乐已开始播放');
-    }, undefined, function(error) {
-      console.error('❌ 音频加载失败:', error);
+    const context = listener.context;
+    context.resume().then(() => {
+      console.log('🎵 AudioContext 已恢复');
+
+      const audioLoader = new THREE.AudioLoader();
+      const starsAudioPath = new URL('/stars.mp3', import.meta.url).href;
+
+      audioLoader.load(
+        starsAudioPath,
+        function(buffer) {
+          backgroundMusic.setBuffer(buffer);
+          backgroundMusic.setLoop(true);
+          backgroundMusic.setVolume(0.5);
+          backgroundMusic.play();
+          hasUserInteracted = true;
+          console.log('🔊 背景音乐已开始播放');
+        },
+        undefined,
+        function(error) {
+          console.error('❌ 音频加载失败:', error);
+        }
+      );
     });
 
-    // 移除监听器防止重复触发
     window.removeEventListener('click', handleFirstInteraction);
     window.removeEventListener('touchstart', handleFirstInteraction);
   }
